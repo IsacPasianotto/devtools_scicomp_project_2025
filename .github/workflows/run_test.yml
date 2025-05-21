@@ -30,7 +30,7 @@ jobs:
           whoami
           ls
           dnf update -y
-          dnf install -y openmpi
+          dnf install -y openmpi openmpi-devel
           source /etc/profile.d/modules.sh
           module load mpi
 
@@ -39,4 +39,4 @@ jobs:
           python --version
           mpirun --version
       - name: Test with pytest
-        run: mpirun pytest
+        run: mpirun python -m pytest --with-mpi

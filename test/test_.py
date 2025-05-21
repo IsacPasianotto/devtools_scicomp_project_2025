@@ -1,5 +1,11 @@
 import pytest
 
+@pytest.mark.mpi(min_size=2)
+def test_multiple_prints():
+    print("aaaa")
+    assert True
 
-def test_always_passes():
+@pytest.mark.mpi_skip()
+def test_single_print():
+    print("bbbb")
     assert True
