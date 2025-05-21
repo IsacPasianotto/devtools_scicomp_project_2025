@@ -34,9 +34,14 @@ jobs:
           source /etc/profile.d/modules.sh
           module load mpi
 
+          echo "source/profile.d/modules.sh" >> $HOME/.bashrc
+          echo "module load mpi" >> $HOME/.bashrc
+
           python -m pip install -r requirements.txt
 
           python --version
           mpirun --version
       - name: Test with pytest
-        run: mpirun python -m pytest --with-mpi
+        run: |
+
+          mpirun python -m pytest --with-mpi
