@@ -33,13 +33,9 @@ jobs:
           source /etc/profile.d/modules.sh
           module load mpi
 
+          pip install requirements.txt
+
           python --version
           mpirun --version
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - uses: pavelzw/pytest-action@v2
-        with:
-          emoji: false
-          verbose: false
-          job-summary: true
-
+      - name: Test with pytest
+        run: mpirun pytest
