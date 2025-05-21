@@ -9,7 +9,7 @@ jobs:
     name: Run tests
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     runs-on: ubuntu-latest
     container:
       image: fedora:42
@@ -29,8 +29,13 @@ jobs:
         run: |
           whoami
           dnf update
-          dnf install openmpi
+          dnf install -y openmpi
           module load mpi/openmpi-x86_64
+          dnf install -y python${matrix.python-version//.} python${matrix.python-version//.}-pip
+          alternatives --set python /usr/bin/python${matrix.python-version//.}
+
+          python --version
+          mpirun --version
       - name: Install dependencies
         run: pip install pytest pytest-md pytest-emoji
       - uses: pavelzw/pytest-action@v2
