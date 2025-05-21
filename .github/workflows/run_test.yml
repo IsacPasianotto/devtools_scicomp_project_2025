@@ -1,0 +1,46 @@
+name: Run Python tests
+
+on:
+  push:
+    branches: [ 'main', 'feature/cicd' ]
+
+jobs:
+  tests:
+    name: Run tests
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:42
+    
+    steps:
+      - uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "Europe/Berlin"
+
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python and tools
+        run: |
+          whoami
+          ls
+          dnf update -y
+          dnf install -y openmpi openmpi-devel
+          source /etc/profile.d/modules.sh
+          module load mpi
+
+          python -m pip install -r requirements.txt
+
+          python --version
+          mpirun --version
+      - name: Test with pytest
+        run: |
+          source /etc/profile.d/modules.sh
+          module load mpi
+          mpirun --allow-run-as-root --oversubscribe -n 2 pytest --with-mpi
+          python -m pytest
