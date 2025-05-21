@@ -32,13 +32,13 @@ jobs:
           dnf install -y openmpi
           source /etc/profile.d/modules.sh
           module load mpi
-          # dnf install -y python${matrix.python-version//.} python${matrix.python-version//.}-pip
-          # alternatives --set python /usr/bin/python${matrix.python-version//.}
+          dnf install -y python${matrix.python-version//.} python${matrix.python-version//.}-pip
+          alternatives --set python /usr/bin/python${matrix.python-version//.}
 
           python --version
           mpirun --version
       - name: Install dependencies
-        run: pip install pytest pytest-md pytest-emoji
+        run: pip install -r requiremets.txt
       - uses: pavelzw/pytest-action@v2
         with:
           emoji: false
