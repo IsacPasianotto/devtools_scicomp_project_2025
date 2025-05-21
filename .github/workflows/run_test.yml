@@ -27,9 +27,10 @@ jobs:
 
       - name: Install Python and tools
         run: |
-          ls
-          which sudo
-
+          whoami
+          dnf update
+          dnf install openmpi
+          module load mpi/openmpi-x86_64
       - name: Install dependencies
         run: pip install pytest pytest-md pytest-emoji
       - uses: pavelzw/pytest-action@v2
