@@ -9,9 +9,11 @@ jobs:
     name: Run tests
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     runs-on: ubuntu-latest
-
+    container:
+      image: fedora:42
+    
     steps:
       - uses: szenius/set-timezone@v1.2
         with:
@@ -25,8 +27,8 @@ jobs:
 
       - name: Install Python and tools
         run: |
-          apt-get update
-          apt-get install -y openmpi-bin
+          ls
+          which sudo
 
       - name: Install dependencies
         run: pip install pytest pytest-md pytest-emoji
