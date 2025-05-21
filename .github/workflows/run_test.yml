@@ -33,7 +33,7 @@ jobs:
           source /etc/profile.d/modules.sh
           module load mpi
 
-          pip install requirements.txt
+          pip install -r requirements.txt
 
           python --version
           mpirun --version
