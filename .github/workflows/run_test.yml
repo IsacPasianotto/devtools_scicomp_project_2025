@@ -42,5 +42,5 @@ jobs:
         run: |
           source /etc/profile.d/modules.sh
           module load mpi
-          mpirun python -m pytest --with-mpi
+          mpirun -n 2 "python -m pytest --with-mpi"
           python -m pytest
