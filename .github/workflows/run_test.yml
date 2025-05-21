@@ -28,9 +28,10 @@ jobs:
       - name: Install Python and tools
         run: |
           whoami
-          dnf update -y 
+          dnf update -y
           dnf install -y openmpi
-          module load mpi/openmpi-x86_64
+          source /etc/profile.d/modules.sh
+          module load mpi
           # dnf install -y python${matrix.python-version//.} python${matrix.python-version//.}-pip
           # alternatives --set python /usr/bin/python${matrix.python-version//.}
 
