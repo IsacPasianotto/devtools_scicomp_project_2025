@@ -28,12 +28,13 @@ jobs:
       - name: Install Python and tools
         run: |
           whoami
+          ls
           dnf update -y
           dnf install -y openmpi
           source /etc/profile.d/modules.sh
           module load mpi
 
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
 
           python --version
           mpirun --version
