@@ -3,7 +3,9 @@ name: Run Python tests
 on:
   push:
     branches: [ 'main', 'feature/cicd' ]
-
+  pull_request:
+    branches:
+      - main
 jobs:
   tests:
     name: Run tests
@@ -13,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: fedora:42
-    
+
     steps:
       - uses: szenius/set-timezone@v1.2
         with:
