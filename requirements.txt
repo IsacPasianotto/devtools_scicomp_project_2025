@@ -6,3 +6,5 @@ pytest==8.3.4
 tomli==2.2.1
 mpi4py==4.0.3
 pytest-mpi==0.6
+rich==14.0.0
+PyYAML==6.0.2
