@@ -1,7 +1,7 @@
 """Script which uses built packages to run the matmatmul code"""
 import argparse
 from logging import Logger
-from pymatmatmul.utils import read_config, setup_logger
+from pymatmatmul.utils import read_config, setup_logger, validate_config
 
 
 logger: Logger = setup_logger("INFO")
@@ -19,6 +19,12 @@ def main(config_file: str):
     log_level = kwargs.get("logLevel", "INFO").upper()
     logger.setLevel(log_level)
     logger.debug(f"Parsed config: {kwargs}")
+
+    try:
+        validate_config(kwargs)
+    except (AttributeError, AssertionError, NotImplementedError) as e:
+        logger.error("Configuration validation failed: %s", e, exc_info=True)
+        exit(1)
 
     logger.info("TODO: validate the configuration file here")
 

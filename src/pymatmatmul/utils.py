@@ -4,6 +4,7 @@ import yaml
 import logging
 from rich.logging import RichHandler
 from logging import Logger
+from typing import List, Dict
 
 
 def setup_logger(level: str = "INFO") -> Logger:
@@ -47,3 +48,46 @@ def read_config(file: str) -> dict:
         kwargs = yaml.safe_load(stream)
     return kwargs
 
+
+def validate_config(config: dict) -> None:
+    """
+    Validates the configuration dictionary.
+
+    Args:
+        config (dict): The configuration dictionary to validate.
+
+    Raises:
+        AttributeError: If any required keys are missing or invalid.
+    """
+    error_msg: str = '''
+        Minimal configuration file requirements are not met.
+        Please provide the following keys in your configuration file:
+        - dimensions:
+            A: [<int>, <int>]
+            B: [<int>, <int>]
+        - genRandomMatrices: <bool>
+        '''
+
+    if "dimensions" not in config or "genRandomMatrices" not in config:
+        raise AttributeError(error_msg)
+
+    dimensions: Dict[str, List[int, int]] = config["dimensions"]
+    if not isinstance(dimensions, dict) or "A" not in dimensions or "B" not in dimensions:
+        raise AttributeError(error_msg)
+
+    assert isinstance(dimensions["A"], list) and len(dimensions["A"]) == 2, error_msg
+    assert isinstance(dimensions["B"], list) and len(dimensions["B"]) == 2, error_msg
+    assert all(isinstance(i, int) for i in dimensions["A"]), error_msg
+    assert all(isinstance(i, int) for i in dimensions["B"]), error_msg
+
+    # Check if the dimensions are compatible for matrix multiplication
+    if dimensions["A"][1] != dimensions["B"][0]:
+        raise AttributeError(
+            f"Matrix A's columns ({dimensions['A'][1]}) must match Matrix B's rows ({dimensions['B'][0]}) for multiplication."
+        )
+
+    # temporarly, if genRandomMatrices is not set to True, say not implemented
+    if not config["genRandomMatrices"]:
+        raise NotImplementedError(
+            "Reading matrices from file is not implemented yet. Please set genRandomMatrices to True."
+        )
