@@ -14,19 +14,23 @@ def main(config_file: str):
     - config_file (str): The name of the configuration file (without the extension).
     """
 
-    logger.info(f"Reading configuration from: {config_file}.yaml")
+    logger.info("Reading configuration from: %s.yaml", config_file)
     kwargs = read_config(config_file)
     log_level = kwargs.get("logLevel", "INFO").upper()
     logger.setLevel(log_level)
-    logger.debug(f"Parsed config: {kwargs}")
 
     try:
         validate_config(kwargs)
     except (AttributeError, AssertionError, NotImplementedError) as e:
         logger.error("Configuration validation failed: %s", e, exc_info=True)
         exit(1)
+    logger.debug("Configuration validated successfully.")
+    logger.debug("Parsed config: %s", kwargs)
 
-    logger.info("TODO: validate the configuration file here")
+    if kwargs.get("genRandomMatrices"):
+        logger.info("Generating random %dx%d &%dx%d matrices.",
+                    kwargs["dimensions"]["A"][0], kwargs["dimensions"]["A"][1],
+                    kwargs["dimensions"]["B"][0], kwargs["dimensions"]["B"][1])
 
     logger.info("TODO: Matrix multiplication operation would go here.")
 

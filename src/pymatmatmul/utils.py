@@ -80,14 +80,40 @@ def validate_config(config: dict) -> None:
     assert all(isinstance(i, int) for i in dimensions["A"]), error_msg
     assert all(isinstance(i, int) for i in dimensions["B"]), error_msg
 
-    # Check if the dimensions are compatible for matrix multiplication
+    if config["dimensions"]["A"][0] <= 0 or config["dimensions"]["A"][1] <= 0:
+        raise AttributeError(
+            "Matrix A dimensions must be positive integers."
+        )
+
     if dimensions["A"][1] != dimensions["B"][0]:
         raise AttributeError(
-            f"Matrix A's columns ({dimensions['A'][1]}) must match Matrix B's rows ({dimensions['B'][0]}) for multiplication."
+            "Matrix A's columns (%d) must match Matrix B's rows (%d) for multiplication."
+             % (dimensions["A"][1], dimensions["B"][0])
         )
 
     # temporarly, if genRandomMatrices is not set to True, say not implemented
     if not config["genRandomMatrices"]:
         raise NotImplementedError(
             "Reading matrices from file is not implemented yet. Please set genRandomMatrices to True."
+        )
+
+    # default values for optional parameters
+    config.setdefault("logLevel", "INFO")
+    config.setdefault("backend", "python")
+    config.setdefault("generationMin", 0.0)
+    config.setdefault("generationMax", 1.0)
+
+    if config["backend"] not in ["python", "numpy"]:
+        raise AttributeError(
+            f"Invalid backend: {config['backend']}. Available backends are: python, numpy."
+        )
+
+    if not (isinstance(config["generationMin"], (int, float)) and isinstance(config["generationMax"], (int, float))):
+        raise AttributeError(
+            "generationMin and generationMax must be either int or float."
+        )
+
+    if config["generationMin"] >= config["generationMax"]:
+        raise AttributeError(
+            "generationMin must be less than generationMax."
         )
