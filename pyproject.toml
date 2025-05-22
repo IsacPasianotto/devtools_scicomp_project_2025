@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "pyclassify"
+name = "pymatmatmul"
 version = "0.0.1"
 description = "devtools_scicomp_project_2025"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "Isac Pasianotto", email = "yh4mop12z@gmail.com" }]
+authors = [{ name = "Isac Pasianotto", email = "ISAC.PASIANOTTO@phd.units.it" }, {name = "Niccolò Tosato", email = "NICCOLO.TOSATO@phd.units.it"}]
 dynamic = ["dependencies"]
 
 [tool.setuptools.packages.find]
