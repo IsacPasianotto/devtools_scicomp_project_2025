@@ -19,12 +19,11 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     # TO DO aggiungere dtype
     C = np.zeros(shape=(n_local,p_global),
                  order='C')
-    buffer = np.empty(shape=(n_global,get_n_local(p_global,size,0)),
+    buffer = np.empty(shape=(m_global,get_n_local(p_global,size,0)),
                       order='C')
 
     n_offset = get_n_offset(n_global, size, rank)
     n_loc = get_n_local(n_global, size, rank)
-
     m_offset =get_n_offset(m_global, size, rank)
     m_loc = get_n_local(m_global, size, rank)
 
@@ -45,7 +44,7 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
             sendbuf=bufferino_contiguo,
             recvbuf=(buffer, sendcounts, displacements, MPI.DOUBLE) #TODO correct data type
         )
-        C[n_offset:n_offset+n_loc,p_offset:p_offset+p_loc]+=mm(A,buffer) #TODO insert a view
+        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,buffer) #TODO insert a view
 
 
 def matmul_base(A,B):
