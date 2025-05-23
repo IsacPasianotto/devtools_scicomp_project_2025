@@ -31,7 +31,6 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     # with python >= 3.10 we can move towards case switch
     if algorithm == "base":
         mm =  matmul_base
-
     # Init mpi
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -44,6 +43,7 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
 
     C = np.zeros(shape=(n_loc,p_global),
                  order='C',dtype=dtype)
+
     buffer = np.empty(shape=(m_global,get_n_local(p_global,size,0)),
                       order='C',dtype=dtype)
 
@@ -53,17 +53,15 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
         p_loc_iter = get_n_local(p_global, size, k)
 
         sendcounts = np.array(comm.allgather(m_loc*p_loc_iter)) #TODO remove communication
-
+        #use ravel instead of flatten, ravel is in place, flatten return a copy
+        fit_buffer = buffer.ravel()[:m_global*p_loc_iter].reshape((m_global, p_loc_iter))
         displacements = np.insert(np.cumsum(sendcounts[:-1]), 0, 0)
-        bufferino_contiguo = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=dtype)
-        print(f"{rank=} {bufferino_contiguo.shape=} {sendcounts=}")
-
+        fit_buffer[m_offset:m_offset+m_loc,0:p_loc_iter] = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=dtype)
         comm.Allgatherv(
-            sendbuf=bufferino_contiguo, # TODO consider in place
-            recvbuf=(buffer, sendcounts, displacements, MPI.DOUBLE  ) #TODO correct data type ->  mpi4py.util.dtlib.from_numpy_dtype(dtype)
+            sendbuf=MPI.IN_PLACE, # TODO consider in place MPI.IN_PLACE
+            recvbuf=(fit_buffer, sendcounts, displacements, MPI.DOUBLE  ) #TODO correct data type ->  mpi4py.util.dtlib.from_numpy_dtype(dtype)
         )
-        print(f"{rank=} {buffer}")
-        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,buffer)
+        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,fit_buffer)
     return C
 
 def matmul_base(A,B):
