@@ -11,7 +11,7 @@ jobs:
     name: Run tests
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     runs-on: ubuntu-latest
     container:
       image: fedora:42
@@ -45,5 +45,5 @@ jobs:
         run: |
           source /etc/profile.d/modules.sh
           module load mpi
-          mpirun --allow-run-as-root --oversubscribe -n 2 pytest --with-mpi
+          mpirun --allow-run-as-root --oversubscribe -n 2 python -m pytest --with-mpi
           python -m pytest
