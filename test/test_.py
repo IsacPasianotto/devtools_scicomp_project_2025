@@ -17,8 +17,8 @@ def test_multiple_prints():
     assert True
 @pytest.mark.mpi(min_size=2,max_size=2)
 def test_mat_mul():
-    A = np.empty((3,4))
-    B = np.empty((4,6))
+    A = np.empty((3,4)) # global size: 6,4
+    B = np.empty((2,6)) # global size  4,6
     c = pymatmatmul.matmul.matmul(A,B,6,4,6)
 
 @pytest.mark.mpi_skip()
