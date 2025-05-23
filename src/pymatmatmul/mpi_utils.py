@@ -1,12 +1,13 @@
 """Utilities for MPI communication and matrix (de)composition for easier implementation of tests"""
 from mpi4py import MPI
+from mpi4py.util import dtlib
 import numpy as np
 from numpy.typing import NDArray
 
 
 def get_n_local(Arows: int, world_size: int, rank: int) -> int:
     """
-    Calculate the number of rows the passed rank will recieve when splitting the matrix.
+    Calculate the number of rows the passeshaped rank will recieve when splitting the matrix.
     In case of uneven division, the first ranks will receive one extra row.
 
     Args:
@@ -38,10 +39,8 @@ def get_n_offset(Arows, world_size, rank):
     return remainder * (min_rows + 1) + (rank - remainder) * min_rows
 
 
-def matrix_from_root_to_raks(
+def matrix_from_root_to_ranks(
         A: NDArray,
-        world_size: int,
-        rank: int,
         comm: MPI.Comm
         ) -> NDArray:
     """
@@ -50,15 +49,17 @@ def matrix_from_root_to_raks(
 
     Args:
     - A (np.ndarray): The matrix to be split.
-    - world_size (int): The total number of ranks.
-    - rank (int): The rank to calculate the number of rows for, commonly the current rank.
     - comm (MPI.Comm): The MPI communicator.
 
     Returns:
     - np.ndarray: The local matrix assigned to the given rank.
     """
+    world_size = comm.Get_size()
+    rank = comm.Get_rank()
 
     if rank == 0:
+        if world_size > A.shape[0]:
+            raise ValueError("Number of ranks exceeds number of rows in A.")
         shape: tuple = A.shape
         dtype: np.dtype = A.dtype
         comm.bcast(shape, root=0)
@@ -73,7 +74,7 @@ def matrix_from_root_to_raks(
         for i in range(1, world_size):
             n_local_i: int = get_n_local(A.shape[0], world_size, i)
             n_offset_i: int = get_n_offset(A.shape[0], world_size, i)
-            comm.Send([A[n_offset_i:n_offset_i + n_local_i, :], MPI.DOUBLE], dest=i)
+            comm.Send([A[n_offset_i:n_offset_i + n_local_i, :], dtlib.from_numpy_dtype(dtype)], dest=i)
     else:
         shape: tuple = comm.bcast(None, root=0)
         dtype_str: str = comm.bcast(None, root=0)
@@ -83,15 +84,13 @@ def matrix_from_root_to_raks(
 
         n_offset: int = get_n_offset(shape[0], world_size, rank)
         A_local: NDArray = np.empty((n_local, shape[1]), dtype=dtype)
-        comm.Recv([A_local, MPI.DOUBLE], source=0)
+        comm.Recv([A_local, dtlib.from_numpy_dtype(dtype)], source=0)
 
     return A_local
 
 
 def gather_from_ranks_to_root(
         A_local: NDArray,
-        world_size: int,
-        rank: int,
         comm: MPI.Comm
         ) -> NDArray:
     """
@@ -101,13 +100,11 @@ def gather_from_ranks_to_root(
 
     Args:
     - A_local (np.ndarray): The local matrix assigned to the given rank.
-    - world_size (int): The total number of ranks.
-    - rank (int): The rank which is gathering the matrices.
     - comm (MPI.Comm): The MPI communicator.
     Returns:
     - np.ndarray: The concatenated matrix on the root rank, None on other ranks.
     """
-
+    rank = comm.Get_rank()
     A_gathered: NDArray = comm.gather(A_local, root=0)
 
     if rank == 0:
@@ -151,7 +148,7 @@ if __name__ == "__main__":
         print(A)
         print("--------------------------------")
     comm.Barrier()
-    A_local = matrix_from_root_to_raks(A, size, rank, comm)
+    A_local = matrix_from_root_to_ranks(A, size, rank, comm)
     print_matrix(A_local, rank, size, comm)
 
     comm.Barrier()
