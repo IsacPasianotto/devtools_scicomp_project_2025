@@ -11,10 +11,6 @@ def test_generation_matrices():
                                  dtype= np.float32)
     assert A.shape == (3, 4)
 
-@pytest.mark.mpi(min_size=2)
-def test_multiple_prints():
-    print("aaaa")
-    assert True
 @pytest.mark.mpi(min_size=2,max_size=2)
 def test_mat_mul():
     A = np.empty((3,4)) # global size: 6,4
