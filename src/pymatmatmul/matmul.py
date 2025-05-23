@@ -1,6 +1,6 @@
 import numpy as np
-import mpi4py
 from mpi4py import MPI
+from mpi4py.util import dtlib
 from pymatmatmul.mpi_utils import get_n_local,get_n_offset
 def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     ###################################
@@ -41,11 +41,11 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     m_offset =get_n_offset(m_global, size, rank)
     m_loc = get_n_local(m_global, size, rank)
 
-    C = np.zeros(shape=(n_loc,p_global),
-                 order='C',dtype=dtype)
+    C = np.zeros(shape=(n_loc, p_global),
+                 order='C', dtype=dtype)
 
     buffer = np.empty(shape=(m_global,get_n_local(p_global,size,0)),
-                      order='C',dtype=dtype)
+                      order='C', dtype=dtype)
 
     for k in range(size):
 
@@ -59,9 +59,9 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
         fit_buffer[m_offset:m_offset+m_loc,0:p_loc_iter] = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=dtype)
         comm.Allgatherv(
             sendbuf=MPI.IN_PLACE, # TODO consider in place MPI.IN_PLACE
-            recvbuf=(fit_buffer, sendcounts, displacements, MPI.DOUBLE  ) #TODO correct data type ->  mpi4py.util.dtlib.from_numpy_dtype(dtype)
+            recvbuf=(fit_buffer, sendcounts, displacements, dtlib.from_numpy_dtype(dtype)  ) #TODO correct data type ->  mpi4py.util.dtlib.from_numpy_dtype(dtype)
         )
-        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,fit_buffer)
+        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A, fit_buffer)
     return C
 
 def matmul_base(A,B):
