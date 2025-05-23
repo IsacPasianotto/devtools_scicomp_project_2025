@@ -29,7 +29,6 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
 
     p_loc = get_n_local(p_global, size, rank)
     p_offset = get_n_offset(p_global, size, rank)
-
     for k in range(size):
 
 
@@ -39,15 +38,15 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
         sendcounts = np.array(comm.allgather(m_loc*p_loc_iter)) #TODO remove communication
 
         displacements = np.insert(np.cumsum(sendcounts[:-1]), 0, 0)
-        bufferino_contiguo = np.ascontiguousarray(B[m_offset:m_offset+m_loc,p_offset_iter:p_offset_iter+p_loc_iter],dtype=np.double)
-        print(f"{rank=} {bufferino_contiguo=} {sendcounts=}")
+        bufferino_contiguo = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=np.double)
+        print(f"{rank=} {bufferino_contiguo.shape=} {sendcounts=}")
 
         comm.Allgatherv(
-            sendbuf=bufferino_contiguo,
+            sendbuf=bufferino_contiguo, # TODO consider in place
             recvbuf=(buffer, sendcounts, displacements, MPI.DOUBLE) #TODO correct data type
         )
         print(f"{rank=} {buffer}")
-        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,buffer) #TODO insert a view
+        C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,buffer)
     return C
 
 def matmul_base(A,B):
