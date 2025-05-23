@@ -32,7 +32,7 @@ jobs:
           whoami
           ls
           dnf update -y
-          dnf install -y openmpi openmpi-devel
+          dnf install -y gcc gcc-c++ openmpi openmpi-devel
           source /etc/profile.d/modules.sh
           module load mpi
 
