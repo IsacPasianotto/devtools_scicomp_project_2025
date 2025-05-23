@@ -45,7 +45,7 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
             recvbuf=(buffer, sendcounts, displacements, MPI.DOUBLE) #TODO correct data type
         )
         C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A,buffer) #TODO insert a view
-
+    return C
 
 def matmul_base(A,B):
     return A@B

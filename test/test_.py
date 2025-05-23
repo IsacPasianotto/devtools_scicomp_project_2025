@@ -19,8 +19,9 @@ def test_multiple_prints():
 def test_mat_mul():
     A = np.empty((3,4)) # global size: 6,4
     B = np.empty((2,6)) # global size  4,6
-    c = pymatmatmul.matmul.matmul(A,B,6,4,6)
-
+    C = pymatmatmul.matmul.matmul(A,B,6,4,6)
+    print(C)
+    assert np.sum((C == 4)) == 36
 @pytest.mark.mpi_skip()
 def test_single_print():
     print("bbbb")
