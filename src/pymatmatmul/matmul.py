@@ -1,11 +1,11 @@
 import numpy as np
 from mpi4py import MPI
-from mpi_utils import get_n_local,get_n_offset
+from pymatmatmul.mpi_utils import get_n_local,get_n_offset
 def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     #TO DO: CAPIRE COME
 
-    A= np.array(A)
-    B= np.array(B)
+    A= np.ascontiguousarray(A)
+    B= np.ascontiguousarray(B)
 
     #Sanitize shape
     assert True
@@ -17,9 +17,9 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     size = comm.Get_size()
     n_local = get_n_local(n_global,size,rank)
     # TO DO aggiungere dtype
-    C = np.zeros(size=(n_local,p_global),
+    C = np.zeros(shape=(n_local,p_global),
                  order='C')
-    buffer = np.empty(size=(n_global,get_n_local(p_global,size,0)),
+    buffer = np.empty(shape=(n_global,get_n_local(p_global,size,0)),
                       order='C')
 
     n_offset = get_n_offset(n_global, size, rank)
@@ -40,16 +40,16 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
         sendcounts = np.array(comm.allgather(m_loc*p_loc_iter)) #TODO remove communication
 
         displacements = np.insert(np.cumsum(sendcounts[:-1]), 0, 0)
-
+        bufferino_contiguo = np.ascontiguousarray(B[m_offset:m_offset+m_loc,p_offset_iter:p_offset_iter+p_loc_iter])
         comm.Allgatherv(
-            sendbuf=B[m_offset:m_offset+m_loc,p_offset_iter:p_offset_iter+p_loc_iter],
+            sendbuf=bufferino_contiguo,
             recvbuf=(buffer, sendcounts, displacements, MPI.DOUBLE) #TODO correct data type
         )
-        C[n_offset:n_offset+n_loc,p_offset:p_offset+p_loc]+=mm(A,B) #TODO insert a view
+        C[n_offset:n_offset+n_loc,p_offset:p_offset+p_loc]+=mm(A,buffer) #TODO insert a view
 
 
 def matmul_base(A,B):
-    pass
+    return A@B
 
 
 
