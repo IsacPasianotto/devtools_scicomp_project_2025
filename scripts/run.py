@@ -6,6 +6,7 @@ from mpi4py import MPI
 from pymatmatmul.utils import read_config, setup_logger, validate_config
 from pymatmatmul.mpi_utils import get_n_local, print_matrix
 from pymatmatmul.gen_matrices import generate_random_matrix
+from pymatmatmul.matmul import matmul
 from numpy.typing import NDArray
 
 logger: Logger = setup_logger("INFO")
@@ -63,19 +64,18 @@ def main(config_file: str, comm: MPI.Comm) -> None:
         logger.debug("Rank %d has the following elements ofA:\n%s", rank, A_local)
         logger.debug("Rank %d has the following elements of B:\n%s", rank, B_local)
 
-        # do it only for debug to not waste communication time in real run
-        if log_level == "DEBUG":
-            if rank == 0:
-                logger.debug("------ Matrix A ---")
-            print_matrix(A_local, rank, size, comm, logger)
-            if rank == 0:
-                logger.debug("------ Matrix B ---")
-            print_matrix(B_local, rank, size, comm, logger)
+    if rank == 0:
+        logger.info("Matrices A and B correctly loaded in memory on all ranks.\nStarting matrix multiplication...")
 
+    C_local: NDArray = matmul(A_local, B_local, kwargs["dimensions"]["A"][0],
+                              kwargs["dimensions"]["A"][1],
+                              kwargs["dimensions"]["B"][1],
+                              algorithm=kwargs.get("backend"))
 
-
-    logger.info("TODO: Matrix multiplication operation would go here.")
-
+    comm.Barrier()
+    if rank == 0:
+        logger.debug("------ Result C ---")
+    print_matrix(C_local, rank, size, comm, logger)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
