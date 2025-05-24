@@ -5,6 +5,7 @@ import logging
 from rich.logging import RichHandler
 from logging import Logger
 from typing import List, Dict
+from mpi4py import MPI
 
 
 def setup_logger(level: str = "INFO") -> Logger:
@@ -102,6 +103,9 @@ def validate_config(config: dict) -> None:
     config.setdefault("backend", "python")
     config.setdefault("generationMin", 0.0)
     config.setdefault("generationMax", 1.0)
+    config.setdefault("dtype", "float64")
+
+
 
     if config["backend"] not in ["python", "numpy"]:
         raise AttributeError(
