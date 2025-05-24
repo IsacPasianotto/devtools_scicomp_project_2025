@@ -136,6 +136,6 @@ def print_matrix(
     for i in range(world_size):
         comm.Barrier()
         if rank == i:
-            fout("Rank %d matrix A:" % rank)
+            fout("Rank %d matrix:" % rank)
             fout(A)
             fout("............................")
