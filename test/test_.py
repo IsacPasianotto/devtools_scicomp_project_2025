@@ -11,7 +11,7 @@ from src.pymatmatmul.mpi_utils import matrix_from_root_to_ranks
 
 @pytest.mark.mpi_skip()
 def test_generation_matrices():
-    A = pymatmatmul.gen_matrices.generate_random_matrices( n = 3,m= 4,
+    A = pymatmatmul.gen_matrices.generate_random_matrix( n = 3,m= 4,
                                  generationMin = 0.0,generationMax = 1.0,
                                  dtype= np.float32)
     assert A.shape == (3, 4)
