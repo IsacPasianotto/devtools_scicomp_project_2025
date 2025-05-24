@@ -3,3 +3,4 @@ genRandomMatrices: true
 dimensions:
   A: [10, 10]
   B: [10, 10]
+dtype: float64
