@@ -3,6 +3,7 @@ from mpi4py import MPI
 from mpi4py.util import dtlib
 import numpy as np
 from numpy.typing import NDArray
+from logging import Logger
 
 
 def get_n_local(Arows: int, world_size: int, rank: int) -> int:
@@ -116,7 +117,8 @@ def print_matrix(
         A: NDArray,
         rank: int,
         world_size: int,
-        comm: MPI.Comm
+        comm: MPI.Comm,
+        logger: Logger = None
         ) -> None:
     """
     Print the local matrix assigned to the given rank, in order fromrank 0 to rank n.
@@ -128,10 +130,12 @@ def print_matrix(
     - rank (int): The rank to print the matrix for.
     - world_size (int): The total number of ranks.
     - comm (MPI.Comm): The MPI communicator.
+    - logger (Logger, optional): The logger to use for printing. If None, print to stdout.
     """
+    fout = print if logger is None else logger.debug
     for i in range(world_size):
         comm.Barrier()
         if rank == i:
-            print(f"Rank {i} matrix A:")
-            print(A)
-            print("............................")
+            fout("Rank %d matrix A:" % rank)
+            fout(A)
+            fout("............................")
