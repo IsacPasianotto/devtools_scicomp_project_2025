@@ -1,7 +1,14 @@
+"""Main module for the matmatmul package. Contains the main loop for the distributed matrix multiplication."""
 import numpy as np
 from mpi4py import MPI
 from mpi4py.util import dtlib
 from pymatmatmul.mpi_utils import get_n_local,get_n_offset
+from pymatmatmul.utils import get_valid_backends
+
+def matmul_base(A,B):
+    return A@B
+
+
 def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
     ###################################
     # Input check                     #
@@ -25,9 +32,17 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
 
     # Check shape, consider broadcast  if array or insert a new axis
     if A.ndim != 2:
-        raise ValueError("A must have two dimensions")
+        raise ValueError("A must be a 2-dimensional array")
     if B.ndim != 2:
-        raise ValueError("B must have two dimensions")
+        raise ValueError("B must be a 2-dimensional array")
+
+    if algorithm not in get_valid_backends():
+        raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, get_valid_backends()))
+
+    # TODO: remove this
+    if algorithm in ["numpy", "numba"]:
+        raise NotImplementedError("Algorithm %s not implemented yet. Available algorithms are: %s" % (algorithm, get_valid_backends()))
+
     # with python >= 3.10 we can move towards case switch
     if algorithm == "base":
         mm =  matmul_base
@@ -63,9 +78,3 @@ def matmul(A, B, n_global, m_global, p_global, algorithm="base"):
         )
         C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter]=mm(A, fit_buffer)
     return C
-
-def matmul_base(A,B):
-    return A@B
-
-
-
