@@ -8,6 +8,9 @@ from typing import List, Dict
 from mpi4py import MPI
 
 
+VALID_BACKENDS = ["base", "numpy", "numba"]
+
+
 def setup_logger(level: str = "INFO") -> Logger:
     """
     Sets up a logger with a specified logging level.
@@ -49,6 +52,15 @@ def read_config(file: str) -> dict:
         kwargs = yaml.safe_load(stream)
     return kwargs
 
+
+def get_valid_backends() -> List[str]:
+    """
+    Returns a list of currently supported implementation for matrix multiplication.
+
+    Returns:
+        List[str]: A list of valid backend names.
+    """
+    return VALID_BACKENDS
 
 def validate_config(config: dict) -> None:
     """
@@ -100,17 +112,15 @@ def validate_config(config: dict) -> None:
 
     # default values for optional parameters
     config.setdefault("logLevel", "INFO")
-    config.setdefault("backend", "python")
+    config.setdefault("backend", "base")
     config.setdefault("generationMin", 0.0)
     config.setdefault("generationMax", 1.0)
     config.setdefault("dtype", "float64")
 
-
-
-    if config["backend"] not in ["python", "numpy"]:
-        raise AttributeError(
-            f"Invalid backend: {config['backend']}. Available backends are: python, numpy."
-        )
+    if config["backend"] not in VALID_BACKENDS:
+        raise AttributeError("Invalid backend '%s' selected. Valid backends are %s" %
+        (config["backend"], ", ".join(VALID_BACKENDS))
+    )
 
     if not (isinstance(config["generationMin"], (int, float)) and isinstance(config["generationMax"], (int, float))):
         raise AttributeError(
