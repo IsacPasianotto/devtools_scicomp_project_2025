@@ -20,7 +20,7 @@ def get_n_local(Arows: int, world_size: int, rank: int) -> int:
     """
     return Arows // world_size + (1 if (rank < Arows % world_size) else 0)
 
-def get_n_offset(Arows, world_size, rank):
+def get_n_offset(Arows: int, world_size: int, rank: int) -> int:
     """
     Calculate the offset for the given rank w.r.t. the global matrix.
 
@@ -120,6 +120,8 @@ def print_matrix(
         ) -> None:
     """
     Print the local matrix assigned to the given rank, in order fromrank 0 to rank n.
+    The main purpose of this function is to visualize the local matrix assigned to
+    each rank for debugging purposes.
 
     Args:
     - A (np.ndarray): The local matrix assigned to the given rank.
@@ -133,32 +135,3 @@ def print_matrix(
             print(f"Rank {i} matrix A:")
             print(A)
             print("............................")
-
-# TODO --> move this to a test file
-if __name__ == "__main__":
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-
-    A = np.arange(0, 25).reshape(5, 5) if rank == 0 else None
-
-    if rank == 0:
-        print("--------------------------------")
-        print("Original matrix A:")
-        print(A)
-        print("--------------------------------")
-    comm.Barrier()
-    A_local = matrix_from_root_to_ranks(A, size, rank, comm)
-    print_matrix(A_local, rank, size, comm)
-
-    comm.Barrier()
-    if rank == 0:
-        print("========== now reconstruct it===============")
-    comm.Barrier()
-
-    A = None
-    A = gather_from_ranks_to_root(A_local, size, rank, comm)
-    if rank == 0:
-        print("Reconstructed matrix A:")
-        print(A)
-        print("............................")

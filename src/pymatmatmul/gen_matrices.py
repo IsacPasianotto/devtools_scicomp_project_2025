@@ -3,6 +3,7 @@ from typing import List, Any
 import numpy as np
 from numpy.typing import NDArray
 
+
 def generate_random_matrices(
         n: int,
         m: int,
