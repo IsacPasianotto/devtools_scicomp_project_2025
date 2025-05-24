@@ -1,5 +1,5 @@
 """Generate randomly matrices"""
-from typing import List, Any
+from typing import List, Any, Callable
 import numpy as np
 from numpy.typing import NDArray
 
@@ -30,9 +30,24 @@ def generate_random_matrix(
         raise ValueError("Error! passed non integer values for matrix dimensions.")
     if n <= 0 or m <= 0:
         raise ValueError("Error, tried to generate a matrix with non positive dimensions.")
-    try:
-        dtype = np.dtype(dtype)
-    except TypeError as e:
-        raise ValueError("Error! Invalid type for dtype.") from e
 
-    return (generationMax-generationMin)*np.random.rand(n, m).astype(dtype)+generationMin
+    try:
+        dtype: np.dtype = np.dtype(dtype)
+    except TypeError:
+        raise ValueError(f"Error! Unsupported dtype '{dtype}'. Please use a valid numpy dtype.")
+
+    def generate_float():
+        return (generationMax - generationMin) * np.random.rand(n, m).astype(dtype) + generationMin
+    def generate_int():
+        return np.random.randint(generationMin, generationMax + 1, size=(n, m), dtype=dtype)
+
+    kind_dispatch: dict[str, Callable] = {
+        'f': generate_float,  # float
+        'i': generate_int,    # int
+        'u': generate_int     # unsigned int
+    }
+
+    if dtype.kind not in kind_dispatch:
+        raise ValueError(f"Unsupported dtype kind '{dtype.kind}'. Only float and int are supported.")
+
+    return kind_dispatch[dtype.kind]()
