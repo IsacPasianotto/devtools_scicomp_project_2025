@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def generate_random_matrices(
+def generate_random_matrix(
         n: int,
         m: int,
         generationMin: float = 0.0,
@@ -13,7 +13,7 @@ def generate_random_matrices(
         ) -> NDArray:
     """
 
-    Generate two random matrices A and B of dimensions n x m and m x p respectively.
+    Generate a randomly filled matrix A and B of dimensions n x m.
 
     Args:
     - n (int): Number of rows in matrix A.
@@ -24,9 +24,15 @@ def generate_random_matrices(
 
 
     Returns:
-    - A Randomly generated matrix A of dimensions n x m, composed of random floats if
-        backend is 'python' or numpy array if backend is 'numpy'.
-        backend is 'python' or numpy array if backend is 'numpy'.
+    - A (NDArray): A randomly filled matrix of shape (n, m) with values between generationMin and generationMax.
     """
+    if not isinstance(n, int) or not isinstance(m, int):
+        raise ValueError("Error! passed non integer values for matrix dimensions.")
+    if n <= 0 or m <= 0:
+        raise ValueError("Error, tried to generate a matrix with non positive dimensions.")
+    try:
+        dtype = np.dtype(dtype)
+    except TypeError as e:
+        raise ValueError("Error! Invalid type for dtype.") from e
 
     return (generationMax-generationMin)*np.random.rand(n, m).astype(dtype)+generationMin
