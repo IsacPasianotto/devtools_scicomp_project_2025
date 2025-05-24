@@ -1,9 +1,10 @@
 logLevel: "DEBUG"
 genRandomMatrices: true
 dimensions:
-  A: [10, 10]
-  B: [10, 10]
-dtype: float64
-# dtype: int16
+  A: [3, 3]
+  B: [3, 3]
+# dtype: float64
+dtype: int16
 generationMin: -5
 generationMax: 5
+backend: 'base'
