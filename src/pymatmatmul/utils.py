@@ -8,7 +8,7 @@ from typing import List, Dict
 from mpi4py import MPI
 
 
-VALID_BACKENDS = ["base", "numpy", "numba"]
+VALID_BACKENDS = ["naive", "numpy", "numba"]
 
 
 def setup_logger(level: str = "INFO") -> Logger:
@@ -24,7 +24,7 @@ def setup_logger(level: str = "INFO") -> Logger:
     """
     if level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
         raise ValueError(
-            f"Invalid logging level: {level}. Available levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL."
+            "Invalid logging level: %s. Available levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL." % level
         )
     logging.basicConfig(
         format="%(message)s",
@@ -112,7 +112,7 @@ def validate_config(config: dict) -> None:
 
     # default values for optional parameters
     config.setdefault("logLevel", "INFO")
-    config.setdefault("backend", "base")
+    config.setdefault("backend", "naive")
     config.setdefault("generationMin", 0.0)
     config.setdefault("generationMax", 1.0)
     config.setdefault("dtype", "float64")

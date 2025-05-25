@@ -25,6 +25,9 @@ def generate_random_matrix(
 
     Returns:
     - A (NDArray): A randomly filled matrix of shape (n, m) with values between generationMin and generationMax.
+    Raises:
+    - ValueError: If n or m are not positive integers, or if dtype is unsupported.
+    - ValueError: If generationMin is greater than generationMax.
     """
     if not isinstance(n, int) or not isinstance(m, int):
         raise ValueError("Error! passed non integer values for matrix dimensions.")
@@ -34,7 +37,7 @@ def generate_random_matrix(
     try:
         dtype: np.dtype = np.dtype(dtype)
     except TypeError:
-        raise ValueError(f"Error! Unsupported dtype '{dtype}'. Please use a valid numpy dtype.")
+        raise ValueError("Error! Unsupported dtype %s. Please use a valid numpy dtype." % dtype)
 
     def generate_float():
         return (generationMax - generationMin) * np.random.rand(n, m).astype(dtype) + generationMin
@@ -48,6 +51,6 @@ def generate_random_matrix(
     }
 
     if dtype.kind not in kind_dispatch:
-        raise ValueError(f"Unsupported dtype kind '{dtype.kind}'. Only float and int are supported.")
+        raise ValueError("Unsupported dtype kind '%s'. Only float and int are supported." % dtype.kind)
 
     return kind_dispatch[dtype.kind]()
