@@ -8,7 +8,7 @@ from typing import List, Dict
 from mpi4py import MPI
 
 
-VALID_BACKENDS = ["naive", "numpy", "numba"]
+VALID_BACKENDS = ["naive", "numpy", "numba-jit", "numba-aot"]
 
 
 def setup_logger(level: str = "INFO") -> Logger:
