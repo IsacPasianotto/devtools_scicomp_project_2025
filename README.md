@@ -15,4 +15,6 @@ Course: ADSAI - University of Trieste
   - performance benchmark
   - memory usage analysis
 - (OTPIONAL): script to run in a HPC cluster
-- What about `cupy`?
+- What about
+  - `cupy`?
+  - [`pybind`](https://github.com/pybind/pybind11)
