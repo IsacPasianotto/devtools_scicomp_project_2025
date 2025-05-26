@@ -1,5 +1,6 @@
 # Choosing a build backend:
-requires = ["setuptools"]
+[build-system]
+requires = ["setuptools", "numba", "numpy"]
 build-backend = "setuptools.build_meta"
 
 
@@ -22,3 +23,4 @@ dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
 test = ["pytest"]
+
