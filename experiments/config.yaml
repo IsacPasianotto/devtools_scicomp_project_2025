@@ -1,10 +1,11 @@
 logLevel: "DEBUG"
 genRandomMatrices: true
 dimensions:
-  A: [4, 4]
-  B: [4, 4]
+  A: [10, 10]
+  B: [10, 10]
 # dtype: float64
-dtype: int16
-generationMin: -5
-generationMax: 5
-backend: 'naive'
+dtype: uint16
+generationMin: 0
+generationMax: 1000
+# backend: 'naive'
+backend: 'numba-aot'

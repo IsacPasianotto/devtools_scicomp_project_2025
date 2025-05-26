@@ -155,5 +155,92 @@ def matmul_numbaaot_int16(
     return C
 
 
+@cc.export('matmul_numbaaot_uint64', 'uint64[:,:](uint64[:,:], uint64[:,:])')
+@njit(parallel=True)
+def matmul_numbaaot_uint64(
+        A: 'uint64[:,:]',
+        B: 'uint64[:,:]'
+        ) -> 'uint64[:,:]':
+    """
+    Multiply two matrices A and B using numba AOT (Ahead-Of-Time) compilation for performance.
+    Function compiled to handle uint64 data types.
+
+    Args:
+    - A (np.ndarray): First matrix of shape (n, m).
+    - B (np.ndarray): Second matrix of shape (m, p).
+
+    Returns:
+    - np.ndarray: Resulting matrix of shape (n, p) after multiplication using uint64 data type.
+    """
+    n: int
+    m: int
+    p: int
+    n, m = A.shape
+    _, p = B.shape
+    C: 'uint64[:,:]' = np.zeros((n, p), dtype=A.dtype)
+    for i in prange(n):
+        for j in range(p):
+            for k in range(m):
+                C[i, j] += A[i, k] * B[k, j]
+    return C
+
+@cc.export('matmul_numbaaot_uint32', 'uint32[:,:](uint32[:,:], uint32[:,:])')
+@njit(parallel=True)
+def matmul_numbaaot_uint32(
+        A: 'uint32[:,:]',
+        B: 'uint32[:,:]'
+        ) -> 'uint32[:,:]':
+    """
+    Multiply two matrices A and B using numba AOT (Ahead-Of-Time) compilation for performance.
+    Function compiled to handle uint32 data types.
+
+    Args:
+    - A (np.ndarray): First matrix of shape (n, m).
+    - B (np.ndarray): Second matrix of shape (m, p).
+
+    Returns:
+    - np.ndarray: Resulting matrix of shape (n, p) after multiplication using uint32 data type.
+    """
+    n: int
+    m: int
+    p: int
+    n, m = A.shape
+    _, p = B.shape
+    C: 'uint32[:,:]' = np.zeros((n, p), dtype=A.dtype)
+    for i in prange(n):
+        for j in range(p):
+            for k in range(m):
+                C[i, j] += A[i, k] * B[k, j]
+    return C
+
+@cc.export('matmul_numbaaot_uint16', 'uint16[:,:](uint16[:,:], uint16[:,:])')
+@njit(parallel=True)
+def matmul_numbaaot_uint16(
+        A: 'uint16[:,:]',
+        B: 'uint16[:,:]'
+        ) -> 'uint16[:,:]':
+    """
+    Multiply two matrices A and B using numba AOT (Ahead-Of-Time) compilation for performance.
+    Function compiled to handle uint16 data types.
+
+    Args:
+    - A (np.ndarray): First matrix of shape (n, m).
+    - B (np.ndarray): Second matrix of shape (m, p).
+
+    Returns:
+    - np.ndarray: Resulting matrix of shape (n, p) after multiplication using uint16 data type.
+    """
+    n: int
+    m: int
+    p: int
+    n, m = A.shape
+    _, p = B.shape
+    C: 'uint16[:,:]' = np.zeros((n, p), dtype=A.dtype)
+    for i in prange(n):
+        for j in range(p):
+            for k in range(m):
+                C[i, j] += A[i, k] * B[k, j]
+    return C
+
 if __name__ == "__main__":
     cc.compile()
