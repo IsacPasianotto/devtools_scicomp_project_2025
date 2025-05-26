@@ -191,7 +191,9 @@ def matmul(
     n_offset: int = get_n_offset(n_global, size, rank)
     n_loc: int = get_n_local(n_global, size, rank)
     m_offset: int = get_n_offset(m_global, size, rank)
-    m_loc: int = get_n_local(m_global, size, rank)
+    # Compute m_loc for each rank to avoid communicating them for the displacements
+    m_locs: list[int] = [get_n_local(m_global, size, r) for r in range(size)]
+    m_loc: int = m_locs[rank]
 
     C: NDArray = np.zeros(shape=(n_loc, p_global),
                  order='C', dtype=dtype)
@@ -204,7 +206,7 @@ def matmul(
         p_offset_iter: int = get_n_offset(p_global, size, k)
         p_loc_iter: int = get_n_local(p_global, size, k)
 
-        sendcounts: NDArray = np.array(comm.allgather(m_loc*p_loc_iter)) #TODO remove communication
+        sendcounts: NDArray = np.array([m_locs[rank] * p_loc_iter for rank in range(size)])
         # use a view of the buffer to avoid copying data
         fit_buffer: NDArray = buffer.ravel()[:m_global*p_loc_iter].reshape((m_global, p_loc_iter))
         displacements: NDArray = np.insert(np.cumsum(sendcounts[:-1]), 0, 0)
