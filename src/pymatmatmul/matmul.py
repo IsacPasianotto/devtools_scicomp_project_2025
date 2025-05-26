@@ -6,6 +6,8 @@ from pymatmatmul.mpi_utils import get_n_local,get_n_offset
 from pymatmatmul.utils import get_valid_backends
 from numpy.typing import NDArray
 from typing import Any, Callable
+from numba import njit, prange
+
 
 def matmul_naive(
         A: NDArray,
@@ -54,7 +56,7 @@ def matmul_numpy(
     """
     return np.matmul(A, B)
 
-
+@njit(parallel=True)
 def matmul_numbajit(
         A: NDArray,
         B: NDArray
@@ -69,7 +71,16 @@ def matmul_numbajit(
     Returns:
     - np.ndarray: Resulting matrix of shape (n, p) after multiplication.
     """
-    raise NotImplementedError("Numba backend is not implemented yet.")
+    n: int
+    m: int
+    p: int
+    n, m = A.shape
+    _, p = B.shape
+    C: NDArray = np.zeros((n, p), dtype=A.dtype)
+    for i in prange(n):
+        for j in range(p):
+            for k in range(m):
+                C[i, j] += A[i, k] * B[k, j]
 
 def matmul_numbaaot(
         A: NDArray,
