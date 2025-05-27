@@ -213,8 +213,6 @@ def matmul(
 
 
     mm: Callable[NDArray, NDArray] = BACKEND_DISPATCH.get(algorithm)
-    if mm is None:
-        raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, get_valid_backends()))
 
 
     # MPI setup
