@@ -8,8 +8,6 @@ from typing import List, Dict
 from mpi4py import MPI
 
 
-VALID_BACKENDS = ["naive", "numpy", "numba-jit", "numba-aot"]
-
 
 def setup_logger(level: str = "INFO") -> Logger:
     """
@@ -53,14 +51,6 @@ def read_config(file: str) -> dict:
     return kwargs
 
 
-def get_valid_backends() -> List[str]:
-    """
-    Returns a list of currently supported implementation for matrix multiplication.
-
-    Returns:
-        List[str]: A list of valid backend names.
-    """
-    return VALID_BACKENDS
 
 def validate_config(config: dict) -> None:
     """

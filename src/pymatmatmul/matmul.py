@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from typing import Any, Callable
 from numba import njit, prange
 import pymatmatmul.numba_compiled_matmul as aotmm
-
+from line_profiler import profile
 
 def matmul_naive(
         A: NDArray,
@@ -121,6 +121,8 @@ def matmul_numbaaot(
     return mm(A, B)
 
 
+
+@profile
 def matmul(
         A: Any,
         B: Any,
@@ -193,21 +195,23 @@ def matmul(
         except TypeError:
             raise ValueError("Error! The provided dtype: %s is not supported, or the conversion failed." % dtype)
 
-    # Input validation
-    if A.ndim != 2:
-        raise ValueError("A must be a 2-dimensional array")
-    if B.ndim != 2:
-        raise ValueError("B must be a 2-dimensional array")
-    if algorithm not in get_valid_backends():
-        raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, get_valid_backends()))
-
-
     BACKEND_DISPATCH: dict[str, Callable] = {
         "naive": matmul_naive,
         "numpy": matmul_numpy,
         "numba-jit": matmul_numbajit,
         "numba-aot": matmul_numbaaot,
     }
+
+    # Input validation
+    if A.ndim != 2:
+        raise ValueError("A must be a 2-dimensional array")
+    if B.ndim != 2:
+        raise ValueError("B must be a 2-dimensional array")
+    if algorithm not in BACKEND_DISPATCH:
+        raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, BACKEND_DISPATCH.keys()))
+
+
+
     mm: Callable[NDArray, NDArray] = BACKEND_DISPATCH.get(algorithm)
     if mm is None:
         raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, get_valid_backends()))
