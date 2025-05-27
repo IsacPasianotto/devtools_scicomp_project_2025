@@ -107,10 +107,7 @@ def validate_config(config: dict) -> None:
     config.setdefault("generationMax", 1.0)
     config.setdefault("dtype", "float64")
 
-    if config["backend"] not in VALID_BACKENDS:
-        raise AttributeError("Invalid backend '%s' selected. Valid backends are %s" %
-        (config["backend"], ", ".join(VALID_BACKENDS))
-    )
+
 
     if not (isinstance(config["generationMin"], (int, float)) and isinstance(config["generationMax"], (int, float))):
         raise AttributeError(

@@ -3,7 +3,6 @@ import numpy as np
 from mpi4py import MPI
 from mpi4py.util import dtlib
 from pymatmatmul.mpi_utils import get_n_local,get_n_offset
-from pymatmatmul.utils import get_valid_backends
 from numpy.typing import NDArray
 from typing import Any, Callable
 from numba import njit, prange
@@ -134,8 +133,8 @@ def matmul(
         comm:MPI.Comm = None
         ) -> NDArray:
     """
-    Function needed to be called by all MPI processes to perform a matrix
-    matrix multiplication distributely.
+    Function needed to be called by all MPI processes to perform a distributed matrix
+    matrix multiplication.
     It implements a special case of the SUMMA algorithm, where each matrix is splitted
     only along rows (hence the number of column block is always 1).
     The function will try to cast the input matrices into numpy arrays with the given dtype
@@ -171,15 +170,6 @@ def matmul(
     except Exception as e:
         raise RuntimeError("Error converting input matrices to numpy arrays: %s" % e)
 
-    # TODO: check this and remove when not needed
-    '''
-    https://numpy.org/doc/2.1/reference/generated/numpy.asarray.html
-    >>> a = np.array([1, 2], dtype=np.float32)
-    >>> np.shares_memory(np.asarray(a, dtype=np.float32), a)
-    True
-    >>> np.shares_memory(np.asarray(a, dtype=np.float64), a)
-    False
-    '''
     if dtype is None:
         dtype: np.dtype = np.promote_types(A.dtype, B.dtype)
 
@@ -210,10 +200,7 @@ def matmul(
     if algorithm not in BACKEND_DISPATCH:
         raise ValueError("Algorithm %s not supported. Available algorithms are: %s" % (algorithm, BACKEND_DISPATCH.keys()))
 
-
-
     mm: Callable[NDArray, NDArray] = BACKEND_DISPATCH.get(algorithm)
-
 
     # MPI setup
     if comm is None:
