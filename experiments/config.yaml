@@ -9,3 +9,4 @@ generationMin: 0
 generationMax: 1000
 # backend: 'naive'
 backend: 'numba-aot'
+profiler: "memray"
