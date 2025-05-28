@@ -1,5 +1,6 @@
 """Script which uses built packages to run the matmatmul code"""
 import argparse
+import time
 from pymatmatmul.matmul import matmul
 
 import numpy as np
@@ -67,15 +68,22 @@ def main(config_file: str, comm: MPI.Comm) -> None:
 
     if rank == 0:
         logger.info("Matrices A and B correctly loaded in memory on all ranks.\nStarting matrix multiplication...")
-
-    C_local: NDArray = matmul(A_local, B_local, kwargs["dimensions"]["A"][0],
-                              kwargs["dimensions"]["A"][1],
-                              kwargs["dimensions"]["B"][1],
+        start = time.time()
+    n = kwargs["dimensions"]["A"][0]
+    m = kwargs["dimensions"]["A"][1]
+    p = kwargs["dimensions"]["B"][1]
+    C_local: NDArray = matmul(A_local, B_local, n,
+                              m,
+                              p,
                               algorithm=kwargs.get("backend"))
 
     comm.Barrier()
     if rank == 0:
         logger.debug("------ Result C ---")
+        runtime = time.time() - start
+        op = n * p * (2 * m - 1)
+        logger.info("GOP/s %f\n",op/runtime/1E9)
+
     print_matrix(C_local, rank, size, comm, logger)
 
 if __name__ == "__main__":
