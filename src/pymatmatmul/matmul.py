@@ -30,7 +30,6 @@ def matmul_naive(
     p: int
     n, m = A.shape
     _, p = B.shape
-
     C: NDArray = np.zeros((n, p), dtype=A.dtype)
     for i in range(n):
         for j in range(p):
@@ -98,12 +97,10 @@ def matmul_numbaaot(
     - np.ndarray: Resulting matrix of shape (n, p) after multiplication.
     """
     dtype: np.dtype = np.promote_types(A.dtype, B.dtype)
-
-    SUPPORTED_DTYPES: set[np.dtype] = {
-        np.dtype('float32'), np.dtype('float64'),
-        np.dtype('int32'), np.dtype('int64'), np.dtype('int16'),
-        np.dtype('uint64'), np.dtype('uint32'), np.dtype('uint16')
-    }
+    supported_numba_dtypes = ['uint8', 'uint16', 'uint32', 'uint64',
+                              'int8', 'int16', 'int32', 'int64',
+                              'float32', 'float64']
+    SUPPORTED_DTYPES = list(map(np.dtype,supported_numba_dtypes))
     if dtype not in SUPPORTED_DTYPES:
         raise NotImplementedError("Unsupported dtype %s. Supported dtypes are: %s" % (dtype, SUPPORTED_DTYPES))
 

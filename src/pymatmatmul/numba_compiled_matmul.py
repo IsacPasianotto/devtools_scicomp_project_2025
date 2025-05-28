@@ -2,11 +2,9 @@
 import numpy as np
 from numba import njit, prange
 from numba.pycc import CC
-
-
 cc= CC('numba_compiled_matmul')
 
-dtypes = ['uint8', 'uint16', 'uint32', 'uint64',
+supported_numba_dtypes = ['uint8', 'uint16', 'uint32', 'uint64',
           'int8', 'int16', 'int32', 'int64',
           'float32', 'float64']
 
@@ -26,7 +24,7 @@ def register_matmul(dtype):
         return C
 
 # Register all variants
-for dtype in dtypes:
+for dtype in supported_numba_dtypes:
     register_matmul(dtype)
 
 if __name__ == "__main__":
