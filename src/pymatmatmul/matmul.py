@@ -81,6 +81,7 @@ def matmul_numbajit(
         for j in range(p):
             for k in range(m):
                 C[i, j] += A[i, k] * B[k, j]
+    return C
 
 def matmul_numbaaot(
         A: NDArray,
@@ -218,7 +219,6 @@ def matmul(
 
     C: NDArray = np.zeros(shape=(n_loc, p_global),
                  order='C', dtype=dtype)
-    C=C+1
 
     buffer: NDArray = np.empty(shape=(m_global,get_n_local(p_global,size,0)),
                       order='C', dtype=dtype)
