@@ -5,7 +5,6 @@ from mpi4py import MPI
 
 import numpy as np
 from pymatmatmul.mpi_utils import gather_from_ranks_to_root
-
 from src.pymatmatmul.mpi_utils import matrix_from_root_to_ranks
 
 
@@ -17,20 +16,30 @@ def test_generation_matrices():
     assert A.shape == (3, 4)
 
 @pytest.mark.mpi(min_size=2)
-def test_mat_mul():
+@pytest.mark.parametrize("m, n, p", [
+    (50, 49, 35),
+    (60, 40, 30),
+    (100, 100, 100),
+    (20, 50, 10),
+])
+@pytest.mark.parametrize("backend", ["naive", "numpy", "numba-jit", "numba-aot"])
+def test_mat_mul(m, n, p,backend):
     comm = MPI.COMM_WORLD
     comm.Barrier()
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    A = np.ones((50,49))
-    B = np.ones((49, 35))
-    C_expected = A@B
+
+    A = np.ones((m, n))
+    B = np.ones((n, p))
+    C_expected = A @ B
+
     A_local = matrix_from_root_to_ranks(A, comm)
     B_local = matrix_from_root_to_ranks(B, comm)
-    C_local = pymatmatmul.matmul.matmul(A_local,B_local,50,49,35) # C shape 6,6
+
+    C_local = pymatmatmul.matmul.matmul(A_local, B_local, m, n, p,algorithm=backend)
     C_computed = gather_from_ranks_to_root(C_local, comm)
+
     if rank == 0:
-        assert np.array_equal(C_expected, C_computed)
+        assert np.allclose(C_expected, C_computed), f"Matrix multiplication failed for ({m},{n}) x ({n},{p})" # CS101, avoid == on floating point number
     assert True
 
 @pytest.mark.mpi(min_size=2)
