@@ -5,7 +5,8 @@ from pymatmatmul.matmul import matmul
 import numpy as np
 from logging import Logger
 from mpi4py import MPI
-from pymatmatmul.utils import read_config, setup_logger, validate_config, profiler_manager
+from pymatmatmul.utils import read_config, setup_logger, validate_config
+from pymatmatmul.profiler import profiler_manager
 from pymatmatmul.mpi_utils import get_n_local, print_matrix
 from pymatmatmul.gen_matrices import generate_random_matrix
 from numpy.typing import NDArray
@@ -97,9 +98,11 @@ if __name__ == "__main__":
         if rank == 0:
             logger.info("MPI initialized successfully with %d processes.", size)
         with profiler_manager(read_config(args.config_file)["profiler"],rank) as profile:
+            main = profile(main)
             matmul = profile(matmul)
             logger.debug("I am %d of %d", rank, size)
             main(args.config_file, comm)
+
     except Exception as e:
         logger.exception("The following error is occured, aborting the program: %s", e, exc_info=True)
         exit(1)
