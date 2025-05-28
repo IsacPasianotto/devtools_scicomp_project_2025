@@ -5,9 +5,6 @@ import logging
 from rich.logging import RichHandler
 from logging import Logger
 from typing import List, Dict
-from mpi4py import MPI
-
-
 
 def setup_logger(level: str = "INFO") -> Logger:
     """
@@ -106,6 +103,8 @@ def validate_config(config: dict) -> None:
     config.setdefault("generationMin", 0.0)
     config.setdefault("generationMax", 1.0)
     config.setdefault("dtype", "float64")
+    config.setdefault("profiler", "null")
+
 
 
 
@@ -118,3 +117,6 @@ def validate_config(config: dict) -> None:
         raise AttributeError(
             "generationMin must be less than generationMax."
         )
+
+
+
