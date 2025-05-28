@@ -8,7 +8,7 @@ from typing import Any, Callable
 from numba import njit, prange
 import pymatmatmul.numba_compiled_matmul as aotmm
 from line_profiler import profile
-
+from memory_profiler import profile as pluto
 def matmul_naive(
         A: NDArray,
         B: NDArray
@@ -120,8 +120,6 @@ def matmul_numbaaot(
     return mm(A, B)
 
 
-
-@profile
 def matmul(
         A: Any,
         B: Any,
@@ -220,6 +218,7 @@ def matmul(
 
     C: NDArray = np.zeros(shape=(n_loc, p_global),
                  order='C', dtype=dtype)
+    C=C+1
 
     buffer: NDArray = np.empty(shape=(m_global,get_n_local(p_global,size,0)),
                       order='C', dtype=dtype)
@@ -237,10 +236,7 @@ def matmul(
         fit_buffer[m_offset:m_offset+m_loc,0:p_loc_iter] = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=dtype)
 
         # Gather the local blocks of B from all processes
-        comm.Allgatherv(
-            sendbuf=MPI.IN_PLACE,
-            recvbuf=(fit_buffer, sendcounts, displacements, dtlib.from_numpy_dtype(dtype))
-        )
+        comm.Allgatherv( sendbuf=MPI.IN_PLACE,recvbuf=(fit_buffer, sendcounts, displacements, dtlib.from_numpy_dtype(dtype)))
         C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter] = mm(A, fit_buffer)
 
     return C
