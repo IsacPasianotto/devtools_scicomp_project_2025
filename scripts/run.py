@@ -1,12 +1,13 @@
 """Script which uses built packages to run the matmatmul code"""
 import argparse
+from pymatmatmul.matmul import matmul
+
 import numpy as np
 from logging import Logger
 from mpi4py import MPI
-from pymatmatmul.utils import read_config, setup_logger, validate_config
+from pymatmatmul.utils import read_config, setup_logger, validate_config, profiler_manager
 from pymatmatmul.mpi_utils import get_n_local, print_matrix
 from pymatmatmul.gen_matrices import generate_random_matrix
-from pymatmatmul.matmul import matmul
 from numpy.typing import NDArray
 
 logger: Logger = setup_logger("INFO")
@@ -42,7 +43,6 @@ def main(config_file: str, comm: MPI.Comm) -> None:
         logger.info("Generating random %dx%d &%dx%d matrices.",
                     kwargs["dimensions"]["A"][0], kwargs["dimensions"]["A"][1],
                     kwargs["dimensions"]["B"][0], kwargs["dimensions"]["B"][1])
-
     local_A_rows: int = get_n_local(kwargs["dimensions"]["A"][0], size, rank)
     local_B_rows: int = get_n_local(kwargs["dimensions"]["B"][0], size, rank)
     logger.debug("Rank %d will handle %d rows of A and %d rows of B.", rank, local_A_rows, local_B_rows)
@@ -96,9 +96,10 @@ if __name__ == "__main__":
 
         if rank == 0:
             logger.info("MPI initialized successfully with %d processes.", size)
-        logger.debug("I am %d of %d", rank, size)
-
-        main(args.config_file, comm)
+        with profiler_manager(read_config(args.config_file)["profiler"],rank) as profile:
+            matmul = profile(matmul)
+            logger.debug("I am %d of %d", rank, size)
+            main(args.config_file, comm)
     except Exception as e:
         logger.exception("The following error is occured, aborting the program: %s", e, exc_info=True)
         exit(1)
