@@ -31,6 +31,8 @@ def setup_logger(level: str = "INFO") -> Logger:
     return logger
 
 
+logger = setup_logger()
+
 def read_config(file: str) -> dict:
     """
     Reads a YAML configuration file and returns its contents as a dictionary.
