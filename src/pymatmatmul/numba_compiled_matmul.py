@@ -1,8 +1,12 @@
 """Code to compile AOT with numba the matmatmul function for performance."""
+from typing import List
+
 import numpy as np
 from numba import njit, prange
 from numba.pycc import CC
-cc= CC('numba_compiled_matmul')
+
+
+cc= CC('libmatmul')
 
 supported_numba_dtypes = ['uint8', 'uint16', 'uint32', 'uint64',
           'int8', 'int16', 'int32', 'int64',

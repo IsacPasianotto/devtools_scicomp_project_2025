@@ -6,9 +6,7 @@ from pymatmatmul.mpi_utils import get_n_local,get_n_offset
 from numpy.typing import NDArray
 from typing import Any, Callable
 from numba import njit, prange
-import pymatmatmul.numba_compiled_matmul as aotmm
-from line_profiler import profile
-from memory_profiler import profile as pluto
+from pymatmatmul import AOT_BACKEND_DISPATCH,SUPPORTED_DTYPES
 def matmul_naive(
         A: NDArray,
         B: NDArray
@@ -97,23 +95,9 @@ def matmul_numbaaot(
     - np.ndarray: Resulting matrix of shape (n, p) after multiplication.
     """
     dtype: np.dtype = np.promote_types(A.dtype, B.dtype)
-    supported_numba_dtypes = ['uint8', 'uint16', 'uint32', 'uint64',
-                              'int8', 'int16', 'int32', 'int64',
-                              'float32', 'float64']
-    SUPPORTED_DTYPES = list(map(np.dtype,supported_numba_dtypes))
     if dtype not in SUPPORTED_DTYPES:
         raise NotImplementedError("Unsupported dtype %s. Supported dtypes are: %s" % (dtype, SUPPORTED_DTYPES))
 
-    AOT_BACKEND_DISPATCH: dict[np.dtype, Callable] = {
-        np.dtype('float32'): aotmm.matmul_numbaaot_float32,
-        np.dtype('float64'): aotmm.matmul_numbaaot_float64,
-        np.dtype('int32'): aotmm.matmul_numbaaot_int32,
-        np.dtype('int64'): aotmm.matmul_numbaaot_int64,
-        np.dtype('int16'): aotmm.matmul_numbaaot_int16,
-        np.dtype('uint64'): aotmm.matmul_numbaaot_uint64,
-        np.dtype('uint32'): aotmm.matmul_numbaaot_uint32,
-        np.dtype('uint16'): aotmm.matmul_numbaaot_uint16
-    }
     mm: Callable = AOT_BACKEND_DISPATCH.get(dtype)
     return mm(A, B)
 
