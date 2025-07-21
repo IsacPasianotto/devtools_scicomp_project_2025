@@ -1,5 +1,7 @@
 import pymatmatmul.numba_compiled_matmul as numba_aot
 import pymatmatmul.libmatmul as aotmm
+from pymatmatmul.utils import setup_logger
+
 import numpy as np
 
 AOT_BACKEND_DISPATCH = dict()
@@ -15,3 +17,5 @@ for function_name in dir(aotmm):
                 break
 
 SUPPORTED_DTYPES = list(map(np.dtype,numba_aot.supported_numba_dtypes))
+
+logger = setup_logger()

@@ -31,19 +31,18 @@ def setup_logger(level: str = "INFO") -> Logger:
     return logger
 
 
-logger = setup_logger()
 
 def read_config(file: str) -> dict:
     """
     Reads a YAML configuration file and returns its contents as a dictionary.
 
     Args:
-    - file (str): The name of the YAML configuration file (without the extension).
+    - file (str): The name of the YAML configuration file.
 
     Returns:
     - dict: A dictionary containing the key-value pairs from the YAML file.
     """
-    filepath: str = os.path.abspath(f'{file}.yaml')
+    filepath: str = os.path.abspath(f'{file}')
 
     with open(filepath, 'r', encoding='utf8') as stream:
         kwargs = yaml.safe_load(stream)

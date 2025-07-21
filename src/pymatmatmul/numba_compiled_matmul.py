@@ -5,7 +5,6 @@ import numpy as np
 from numba import njit, prange
 from numba.pycc import CC
 
-
 cc= CC('libmatmul')
 
 supported_numba_dtypes = ['uint8', 'uint16', 'uint32', 'uint64',

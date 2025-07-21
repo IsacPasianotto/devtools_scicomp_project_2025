@@ -53,7 +53,7 @@ def matmul_numpy(
     """
     return np.matmul(A, B)
 
-@njit(parallel=True)
+@njit(parallel=False)
 def matmul_numbajit(
         A: NDArray,
         B: NDArray
@@ -74,7 +74,7 @@ def matmul_numbajit(
     n, m = A.shape
     _, p = B.shape
     C: NDArray = np.zeros((n, p), dtype=A.dtype)
-    for i in prange(n):
+    for i in range(n):
         for j in range(p):
             for k in range(m):
                 C[i, j] += A[i, k] * B[k, j]
@@ -217,7 +217,8 @@ def matmul(
         fit_buffer[m_offset:m_offset+m_loc,0:p_loc_iter] = np.ascontiguousarray(B[0:m_loc,p_offset_iter:p_offset_iter+p_loc_iter], dtype=dtype)
 
         # Gather the local blocks of B from all processes
-        comm.Allgatherv( sendbuf=MPI.IN_PLACE,recvbuf=(fit_buffer, sendcounts, displacements, dtlib.from_numpy_dtype(dtype)))
+        comm.Allgatherv( sendbuf=MPI.IN_PLACE,
+                         recvbuf=(fit_buffer, sendcounts, displacements, dtlib.from_numpy_dtype(dtype)))
         C[0:n_loc,p_offset_iter:p_offset_iter+p_loc_iter] = mm(A, fit_buffer)
 
     return C

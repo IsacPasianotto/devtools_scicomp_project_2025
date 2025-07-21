@@ -1,0 +1,10 @@
+logLevel: "{{ log_level }}"
+genRandomMatrices: {{ gen_random_matrices | lower }}
+dimensions:
+  A: [{{ dimensions.A[0] }}, {{ dimensions.A[1] }}]
+  B: [{{ dimensions.B[0] }}, {{ dimensions.B[1] }}]
+dtype: {{ dtype }}
+generationMin: {{ generation_min }}
+generationMax: {{ generation_max }}
+backend: '{{ backend }}'
+profiler: "{{ profiler }}"

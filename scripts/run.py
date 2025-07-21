@@ -6,7 +6,8 @@ from pymatmatmul.matmul import matmul
 import numpy as np
 from logging import Logger
 from mpi4py import MPI
-from pymatmatmul.utils import read_config, setup_logger, validate_config, logger
+from pymatmatmul import logger
+from pymatmatmul.utils import read_config, setup_logger, validate_config
 from pymatmatmul.profiler import profiler_manager
 from pymatmatmul.mpi_utils import get_n_local, print_matrix
 from pymatmatmul.gen_matrices import generate_random_matrix
@@ -27,7 +28,7 @@ def main(config_file: str, comm: MPI.Comm) -> None:
     rank: int = comm.Get_rank()
     size: int = comm.Get_size()
     if rank == 0:
-        logger.info("Reading configuration from: %s.yaml", config_file)
+        logger.info("Reading configuration from: %s", config_file)
     kwargs = read_config(config_file)
     log_level = kwargs.get("logLevel", "INFO").upper()
     logger.setLevel(log_level)
@@ -81,7 +82,7 @@ def main(config_file: str, comm: MPI.Comm) -> None:
         logger.debug("------ Result C ---")
         runtime = time.time() - start
         op = n * p * (2 * m - 1)
-        logger.info("GOP/s %f\n",op/runtime/1E9)
+        logger.info("GOP/s %f with precision: %s\n",op/runtime/1E9,kwargs["dtype"])
 
     print_matrix(C_local, rank, size, comm, logger)
 
