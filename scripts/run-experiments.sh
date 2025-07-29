@@ -49,7 +49,7 @@ process_config() {
 
 
 # How many procs
-procs_list=(2 4)
+procs_list=(2 4 8 16 32 64 96 128)
 # Config files and output folder
 CONFIG_ROOT="../experiments"
 OUTPUT_ROOT="../output"

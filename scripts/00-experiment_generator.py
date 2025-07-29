@@ -3,8 +3,8 @@ from itertools import product
 import os
 
 # Create the config file of experiment as the product of the following lists
-backends = ["naive", "numba_aot", "numba_jit", "numpy"]
-dimensions = [256, 512, 1024, 2048, 4096, 8192]
+backends = ["naive", "numba-aot", "numba-jit", "numpy"]
+dimensions = [256, 512, 1024, 2048, 4096]
 profilers = ["null", "line_profile", "memory_profile", "memray"]
 
 # Default parameters

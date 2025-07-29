@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --partition=EPYC
+#SBATCH --job-name=devtool
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=128
+##SBATCH --cpus-per-task=1
+#SBATCH --mem=0
+#SBATCH --time=24:00:00
+
+# Load openMPI, check that is the same used to install mpi4py ! 
+module load openMPI/4.1.6
+# Activate venv
+source ../venv/bin/activate
+
+# Generate the experiments
+python 00-experiment_generator.py
+# Execute the experiments
+bash run-experiments.sh
